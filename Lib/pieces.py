@@ -14,33 +14,27 @@ chess_pieces = [
 
 
 class Piece: #TODO alle children van Piece moeten een chess icoon hebben in een variabel piece. 
-    def __init__(self, position, colour, piece, name='temp' , status = 'unmoved',):
+    status = 'unmoved'
+    def __init__(self, gridPosition, colour: str, piece: str, name='temp' , status = 'unmoved',):
         self.piece = piece
         self.colour = colour
-        self.position = position
+        self.gridPosition = gridPosition
         self.name = name
-        self.status = status
+        # self.status = status
         pass
     def __str__(self):
         return f"'tis a {self.colour} {self.piece}..."
     
-    def showMoves(self,moveRange = []):
+    def moves(self,moveRange: range = []) -> list[tuple[int,int]]:
         moves = []
         for x in moveRange:
             for y in moveRange:
-                moves.append([x,y])
-        moves.remove([0,0])
+                moves.append((x,y))
+        if (0,0) in moves:
+            moves.remove((0,0))
         return moves
 
-    def move(self):
-        #!
 
-        #After making your move, enable other buttons
-        for c in cells:
-            if c.colour != self.colour:
-                c.state = 'normal'
-            else:
-                c.state = 'disabled'
             
     def castle(self):
         pass
@@ -50,14 +44,16 @@ class Piece: #TODO alle children van Piece moeten een chess icoon hebben in een 
         self.status = 'defeated'    
 
 class King(Piece):
-    def moves(self,moveRange = range(-1,2)):
-        # include castling move
+    @classmethod
+    def moves(self, moveRange = range(-1,2)):
+        # TODO include castling move
         if (self.status=='unmoved'):
             if globals()[f"{self.colour}_rook1"] == 'unmoved':
                 pass 
         return super().moves(moveRange)
 
 class Queen(Piece):
+    @classmethod
     def moves(self, moveRange = range(-7,8)):
         # return super().moves(moveRange)
         return [m for m in super().moves(moveRange) if 0 in m].append([m for m in super().moves(moveRange) if not 0 in m])
@@ -73,7 +69,7 @@ class Bishop(Piece):
         return [m for m in super().moves(moveRange) if (not 0 in m) and (abs(m[0])==abs(m[1]))]
 
 class Knight(Piece):
-    def moves():
+    def moves(self):
         return [[dx * x, dy * y] for x, y in [[1, 2], [2, 1]] for dx in [-1, 1] for dy in [-1, 1]]
     
 class Pawn(Piece):

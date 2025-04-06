@@ -2,33 +2,48 @@ import tkinter as tk
 from Lib.pieces import Piece, King, Queen, Knight, Rook, Bishop, Pawn, chess_pieces
 
 horizontal_positions = ['a','b','c','d','e','f','g','h']
-vertical_positions = [1,2,3,4,5,6,7,8]
+vertical_positions = [8,7,6,5,4,3,2,1]
+turn = 'white'
 
 def chessNotation():
     pass
     #TODO Deze functie geeft de moves die zijn gemaakt door in een algebraïsche schaak notatie.
 
-def translatePosition(pos):
-    return f"{chr(pos[0]+96)}{pos[1]}"
+def translatePosition(pos:tuple):
+    return f"{chr(pos[0]+96)}{vertical_positions[pos[1]-1]}"
 
 def checkmate(king):
     #! dit is een fictieve code
     possibleMovesOpponent = []
     for p in opposingPieces:
         possibleMovesOpponent.append(p.moves())
-    if king.position in possibleMovesOpponent:
+    if king.gridPosition in possibleMovesOpponent:
         return 'checkmate' if set(king.moves).issubset(possibleMovesOpponent) else 'check' 
 
 class Cell(tk.Button):
     # super().bg = 'black'
-    def __init__(self,position,status = None,*args, **kwargs):
-        tk.Button.__init__(self, *args, **kwargs)
-        self.position = position
-        self.status = status
+    def __init__(self,gridPosition: tuple[int,int], piece: Piece = None,*args, **kwargs):
+        tk.Button.__init__(self, command = self.movePiece, *args, **kwargs)
+        self.gridPosition = gridPosition
+        self.piece = piece
         pass
     
     def changeText(self):
         self.text = 'changed'
+
+    def movePiece(self):
+        global turn
+        global cells
+
+        if self.piece.colour != turn:
+            return #TODO De button moet rood flashen
+
+        moves = [move for move in self.piece.moves()]
+        # moves = [translatePosition(move) for move in self.piece.moves()]
+        print(moves)
+
+
+        turn = 'white' if turn =='black' else 'black'
         
     # tk.Button.bind()  
 
@@ -42,7 +57,7 @@ def startGame():
     colours = ['white', 'black']
     #Setting up the pieces
     for c in colours:
-        if c == 'black':
+        if c == 'white':
             ypos1 = 8
             ypos2 = 7
         else:
@@ -67,11 +82,11 @@ def startGame():
     for x in range(1,9):
         for y in range(1,9):
 
-            piece = next((globals()[f"{p}"] for p in chess_pieces if globals()[f"{p}"].position == [x,y]), None)
+            piece = next((globals()[f"{p}"] for p in chess_pieces if globals()[f"{p}"].gridPosition == [x,y]), None)
             print(x,y,piece)
 
-            globals()[f"cell{x}_{y}"] = Cell(position=translatePosition([x,y]),status=piece, text= f'{piece.colour} {piece.piece}' if piece else '', width = 9, height = 3, master=frame)
-            globals()[f"cell{x}_{y}"].grid(column = y, row = x)
+            globals()[f"cell{x}_{y}"] = Cell(gridPosition = (x,y), piece = piece, text = f'{piece.colour} {piece.piece}' if piece else '', width = 9, height = 3, master=frame)
+            globals()[f"cell{x}_{y}"].grid(row = x, column = y)
             cells.append(globals()[f"cell{x}_{y}"])
 
     frame.pack()
