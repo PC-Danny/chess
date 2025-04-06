@@ -15,12 +15,12 @@ chess_pieces = [
 
 class Piece: #TODO alle children van Piece moeten een chess icoon hebben in een variabel piece. 
     status = 'unmoved'
-    def __init__(self, gridPosition, colour: str, piece: str, name='temp' , status = 'unmoved',):
+    def __init__(self, gridPosition, colour: str, piece: str, name:str = 'temp' , status = 'unmoved',):
         self.piece = piece
         self.colour = colour
         self.gridPosition = gridPosition
         self.name = name
-        # self.status = status
+        self.status = status
         pass
     def __str__(self):
         return f"'tis a {self.colour} {self.piece}..."
@@ -44,11 +44,11 @@ class Piece: #TODO alle children van Piece moeten een chess icoon hebben in een 
         self.status = 'defeated'    
 
 class King(Piece):
-    @classmethod
     def moves(self, moveRange = range(-1,2)):
         # TODO include castling move
         if (self.status=='unmoved'):
-            if globals()[f"{self.colour}_rook1"] == 'unmoved':
+            rook = globals()[f"{self.colour}_rook1"]
+            if rook.status == 'unmoved':
                 pass 
         return super().moves(moveRange)
 
