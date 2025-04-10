@@ -15,6 +15,25 @@ chess_pieces = [
 
 class Piece: #TODO alle children van Piece moeten een chess icoon hebben in een variabel piece. 
     status = 'unmoved'
+
+    moveLambdas = [lambda i: i[0] == 0 and i[1] > 0, 
+         lambda i: i[0] == i[1] and i[1] > 0 , 
+         lambda i: i[0] > 0 and i[1] == 0, 
+         lambda i: abs(i[0]) == abs(i[1]) and i[0] > 0 and i[1] < 0, 
+         lambda i: i[0] == 0 and i[1] < 0, 
+         lambda i: i[0] == i[1] and i[1] < 0, 
+         lambda i: i[0] < 0 and i[1] == 0, 
+         lambda i: i[0] == i[1] and i[0] < 0]
+
+    directionVectors = ['movesN',
+                        'movesNE',
+                        'movesE',
+                        'movesSE',
+                        'movesS',
+                        'movesSW',
+                        'movesW',
+                        'movesNW']
+    
     def __init__(self, gridPosition, colour: str, piece: str, name:str = 'temp' , status = 'unmoved',):
         self.piece = piece
         self.colour = colour
@@ -44,19 +63,18 @@ class Piece: #TODO alle children van Piece moeten een chess icoon hebben in een 
         self.status = 'defeated'    
 
 class King(Piece):
-    def moves(self, moveRange = range(-1,2)):
+    def moves(self, rooks, moveRange = range(-1,2)):
         # TODO include castling move
+        moves = super().moves(moveRange)
         if (self.status=='unmoved'):
-            rook = globals()[f"{self.colour}_rook1"]
-            if rook.status == 'unmoved':
-                pass 
-        return super().moves(moveRange)
+            for r in rooks:
+                if r.status == 'unmoved':
+                    moves + [r.gridPosition]
+        return moves
 
 class Queen(Piece):
-    @classmethod
     def moves(self, moveRange = range(-7,8)):
-        # return super().moves(moveRange)
-        return [m for m in super().moves(moveRange) if 0 in m].append([m for m in super().moves(moveRange) if not 0 in m])
+        return [m for m in super().moves(moveRange) if 0 in m]+[m for m in super().moves(moveRange) if (not 0 in m) and (abs(m[0])==abs(m[1]))]
     
 class Rook(Piece):
     def moves(self, moveRange = range(-7,8)):
@@ -70,16 +88,24 @@ class Bishop(Piece):
 
 class Knight(Piece):
     def moves(self):
+        #TODO knights links onder en links boven kunnen niet naar links bewegen.
         return [[dx * x, dy * y] for x, y in [[1, 2], [2, 1]] for dx in [-1, 1] for dy in [-1, 1]]
     
 class Pawn(Piece):
     def moves(self):
+        moves = [[0,1]]
         if self.status == 'unmoved':
-            x = 0
-            if self.colour == 'black':
-                return [[x,-1],[x,-2]]
-            else:
-                return [[x,1],[x,2]]
+            moves.append([0,2])
+        if self.colour == 'black':
+            moves = [[m[0],m[1]*-1] for m in moves]
+        return moves
+
     
     def promotion(self):
         pass
+
+
+if __name__ == "__main__":
+    list = ['Knight', 'Pawn', 'Queen', 'Rook', 'Knight', 'Bishop']
+    piece = Queen(1,'black', 'c')
+    print(piece.moves())
