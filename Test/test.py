@@ -85,3 +85,7 @@ import numpy as np
 [np.array([0,2]),np.array([0,1])] * np.array([0,-1])
 
 (lambda list : [list[0],list[1]*-1])([0,1])
+
+
+### 
+['c'] + [a for a in ['a','b'] if 0 == True]

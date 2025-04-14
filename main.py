@@ -1,6 +1,6 @@
 import numpy as np
 import tkinter as tk
-from Lib.pieces import Piece, King, Queen, Knight, Rook, Bishop, Pawn, chess_pieces
+from Lib.pieces import Piece, King, Queen, Knight, Rook, Bishop, Pawn, chess_pieces, chess_colours
 from utils import sqdist, isPosition
 
 horizontal_positions = ['a','b','c','d','e','f','g','h']
@@ -12,15 +12,40 @@ movedPiece = None
 possibleCellsList = []
 currentCell = None
 
+cells = []
+
+def resetAllCellColor(cells):
+    for cell in cells:
+        cell['bg'] = 'grey90'
+
 def showPossibleMoves():
     global possibleCellsList
     for cell in possibleCellsList:
         if cell['bg'] == 'white':
-            cell.config(bg = 'grey')
+            cell.config(bg = 'grey90')
         else:
             cell.config(bg='white')
 
-
+def checkDiagonal(self) -> bool:
+    x = self.gridPosition[0]
+    y = self.gridPosition[1]
+    diagonals = [[x--1,y-1],[x-1,y-1]] if self.colour == 'white' else [[x--1, y--1], [x-1,y--1]]
+    diagonalMoves = []
+    print(diagonals)
+    print('*')
+    for d in diagonals:
+        try:
+            isPosition(d)
+            print('**')
+            if globals()[f'cell{d[0]}_{d[1]}'].piece.colour == self.oppositeColour:
+                diagonalMoves.append(d)
+                print('***')
+            else:
+                print('***')
+        except:
+            print('#')
+            pass
+    return diagonalMoves
 
 def chessNotation():
     pass
@@ -57,6 +82,7 @@ class Cell(tk.Button):
         global currentCell
         global possibleCellsList
         if moveState or (currentCell != None and currentCell != self and self.piece != None and self.piece.colour == currentCell.piece.colour):
+            resetAllCellColor(cells)
             if self.piece and self.piece.colour != turn:
                 color = self['bg']
                 self.config(bg="red")
@@ -127,11 +153,6 @@ class Cell(tk.Button):
         else:
             moves = [move for move in self.piece.moves()]
         
-
-        # print(moves)
-        # print(self.gridPosition)
-        # print(self.piece.gridPosition)
-        
         # Een loop door de mogelijke nieuwe posities. Stopt mogelijk nieuwe cellen van de piece in een lijst [possibleCellsList].
         if isinstance(self.piece, (King, Knight,Pawn)):
             for move in moves:
@@ -169,9 +190,8 @@ def startGame():
     window = tk.Tk()
     frame = tk.Frame()
 
-    colours = ['white', 'black']
     #Setting up the pieces
-    for c in colours:
+    for c in chess_colours:
         if c == 'white':
             ypos1 = 8
             ypos2 = 7
@@ -193,7 +213,6 @@ def startGame():
 
     #Setting up the chess grid
     global cells
-    cells = []
     for y in range(1,9):
         for x in range(1,9):
 
@@ -204,7 +223,11 @@ def startGame():
             globals()[f"cell{x}_{y}"].grid(row = y, column = x)
             cells.append(globals()[f"cell{x}_{y}"])
 
+
     frame.pack()
+    for c in cells:
+        c['bg'] = 'grey90'
+
 
     window.mainloop()
 

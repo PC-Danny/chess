@@ -1,3 +1,5 @@
+from utils import isPosition
+from main import checkDiagonal
 chess_pieces = [
     'white_king', 
     'white_queen', 
@@ -12,6 +14,7 @@ chess_pieces = [
     'black_rook1', 'black_rook2', 
     'black_pawn1','black_pawn2','black_pawn3','black_pawn4','black_pawn5','black_pawn6','black_pawn7','black_pawn8']
 
+chess_colours = ['white', 'black']
 
 class Piece: #TODO alle children van Piece moeten een chess icoon hebben in een variabel piece. 
     status = 'unmoved'
@@ -23,7 +26,7 @@ class Piece: #TODO alle children van Piece moeten een chess icoon hebben in een 
          lambda i: i[0] == 0 and i[1] < 0, 
          lambda i: i[0] == i[1] and i[1] < 0, 
          lambda i: i[0] < 0 and i[1] == 0, 
-         lambda i: i[0] == i[1] and i[0] < 0]
+         lambda i: abs(i[0]) == abs(i[1]) and i[0] < 0 and i[1] > 0]
 
     directionVectors = ['movesN',
                         'movesNE',
@@ -40,6 +43,7 @@ class Piece: #TODO alle children van Piece moeten een chess icoon hebben in een 
         self.gridPosition = gridPosition
         self.name = name
         self.status = status
+        self.oppositeColour = 'white' if colour == 'black' else 'black'
         pass
     def __str__(self):
         return f"'tis a {self.colour} {self.piece}..."
@@ -96,9 +100,35 @@ class Pawn(Piece):
         moves = [[0,1]]
         if self.status == 'unmoved':
             moves.append([0,2])
+
         if self.colour == 'black':
             moves = [[m[0],m[1]*-1] for m in moves]
+        moves + checkDiagonal(self)
         return moves
+    
+    # def checkDiagonal(self) -> bool:
+    #     x = self.gridPosition[0]
+    #     y = self.gridPosition[1]
+    #     diagonals = [[x--1,y-1],[x-1,y-1]] if self.colour == 'white' else [[x--1, y--1], [x-1,y--1]]
+    #     diagonalMoves = []
+    #     print(diagonals)
+    #     print('*')
+    #     for d in diagonals:
+    #         try:
+    #             isPosition(d)
+    #             print('**')
+    #             if globals()[f'cell{d[0]}_{d[1]}'].piece.colour == self.oppositeColour:
+    #                 diagonalMoves.append(d)
+    #                 print('***')
+    #             else:
+    #                 print('***')
+    #         except:
+    #             print('#')
+    #             pass
+    #     return diagonalMoves
+        # return [d for d in diagonals if globals()[f'cell{self.gridd[0]}_{d[1]}'].piece.colour == chess_colours.remove(self.colour)[0]]
+        
+    
 
     
     def promotion(self):
