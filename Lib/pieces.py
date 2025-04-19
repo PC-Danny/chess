@@ -1,5 +1,4 @@
 from utils import isPosition
-from main import checkDiagonal
 chess_pieces = [
     'white_king', 
     'white_queen', 
@@ -96,36 +95,49 @@ class Knight(Piece):
         return [[dx * x, dy * y] for x, y in [[1, 2], [2, 1]] for dx in [-1, 1] for dy in [-1, 1]]
     
 class Pawn(Piece):
-    def moves(self):
+    def moves(self,cellList):
+        x = self.gridPosition[0]
+        y = self.gridPosition[1]        
+        
         moves = [[0,1]]
         if self.status == 'unmoved':
             moves.append([0,2])
 
         if self.colour == 'black':
             moves = [[m[0],m[1]*-1] for m in moves]
-        moves + checkDiagonal(self)
+        
+        
+        try:
+            if cellList.get(f'cell{x - moves[0][0]}_{y - moves[0][1]}').piece:
+                moves=[]
+        except:
+            pass
+        moves += self.checkDiagonal(cellList, x, y)
+        print(moves)
         return moves
     
-    # def checkDiagonal(self) -> bool:
-    #     x = self.gridPosition[0]
-    #     y = self.gridPosition[1]
-    #     diagonals = [[x--1,y-1],[x-1,y-1]] if self.colour == 'white' else [[x--1, y--1], [x-1,y--1]]
-    #     diagonalMoves = []
-    #     print(diagonals)
-    #     print('*')
-    #     for d in diagonals:
-    #         try:
-    #             isPosition(d)
-    #             print('**')
-    #             if globals()[f'cell{d[0]}_{d[1]}'].piece.colour == self.oppositeColour:
-    #                 diagonalMoves.append(d)
-    #                 print('***')
-    #             else:
-    #                 print('***')
-    #         except:
-    #             print('#')
-    #             pass
-    #     return diagonalMoves
+    def checkDiagonal(self, cellList, x, y) -> bool:
+        diagonals = [[-1,1],[1,1]] if self.colour == 'white' else [[-1, -1], [1,-1]]
+        # diagonals = [[x--1,y-1],[x-1,y-1]] if self.colour == 'white' else [[x--1, y--1], [x-1,y--1]]
+        diagonalMoves = []
+        print('the diagonals are:',diagonals)
+        for d in diagonals:
+            pos = [x - d[0],y - d[1]]
+            print('*')
+            try:
+                isPosition(pos)
+                print(cellList.get(f'cell{pos[0]}_{pos[1]}').piece)
+                if cellList.get(f'cell{pos[0]}_{pos[1]}').piece.colour == self.oppositeColour:
+                    diagonalMoves.append(d)
+                    print('*1')
+                else:
+                    print('*2')
+            except Exception as e:
+                print('#')
+                print(e)
+                pass
+        print('the diagonal moves are:',diagonalMoves)
+        return diagonalMoves
         # return [d for d in diagonals if globals()[f'cell{self.gridd[0]}_{d[1]}'].piece.colour == chess_colours.remove(self.colour)[0]]
         
     

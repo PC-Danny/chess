@@ -12,10 +12,10 @@ movedPiece = None
 possibleCellsList = []
 currentCell = None
 
-cells = []
+cells = {}
 
 def resetAllCellColor(cells):
-    for cell in cells:
+    for key, cell in cells.items():
         cell['bg'] = 'grey90'
 
 def showPossibleMoves():
@@ -26,26 +26,26 @@ def showPossibleMoves():
         else:
             cell.config(bg='white')
 
-def checkDiagonal(self) -> bool:
-    x = self.gridPosition[0]
-    y = self.gridPosition[1]
-    diagonals = [[x--1,y-1],[x-1,y-1]] if self.colour == 'white' else [[x--1, y--1], [x-1,y--1]]
-    diagonalMoves = []
-    print(diagonals)
-    print('*')
-    for d in diagonals:
-        try:
-            isPosition(d)
-            print('**')
-            if globals()[f'cell{d[0]}_{d[1]}'].piece.colour == self.oppositeColour:
-                diagonalMoves.append(d)
-                print('***')
-            else:
-                print('***')
-        except:
-            print('#')
-            pass
-    return diagonalMoves
+# def checkDiagonal(self) -> bool:
+    # x = self.gridPosition[0]
+    # y = self.gridPosition[1]
+    # diagonals = [[x--1,y-1],[x-1,y-1]] if self.colour == 'white' else [[x--1, y--1], [x-1,y--1]]
+    # diagonalMoves = []
+    # print(diagonals)
+    # print('*')
+    # for d in diagonals:
+        # try:
+            # isPosition(d)
+            # print('**')
+            # if globals()[f'cell{d[0]}_{d[1]}'].piece.colour == self.oppositeColour:
+                # diagonalMoves.append(d)
+                # print('***')
+            # else:
+                # print('***')
+        # except:
+            # print('#')
+            # pass
+    # return diagonalMoves
 
 def chessNotation():
     pass
@@ -119,8 +119,7 @@ class Cell(tk.Button):
                 turn = 'white' if turn =='black' else 'black'
             elif self == currentCell:
                 moveState = 1
-                print('well done')
-                
+                    
             else: 
                 pass
         
@@ -146,13 +145,14 @@ class Cell(tk.Button):
         global turn
         global cells
         global possibleCellsList
-        
         if isinstance(self.piece, King):
             rooks = [globals()[f'{self.piece.colour}_rook{i}'] for i in [1,2]]
             moves = [move for move in self.piece.moves(rooks)]
+        elif isinstance(self.piece, Pawn):
+            moves = [move for move in self.piece.moves(cells)]
         else:
             moves = [move for move in self.piece.moves()]
-        
+            
         # Een loop door de mogelijke nieuwe posities. Stopt mogelijk nieuwe cellen van de piece in een lijst [possibleCellsList].
         if isinstance(self.piece, (King, Knight,Pawn)):
             for move in moves:
@@ -221,12 +221,12 @@ def startGame():
 
             globals()[f"cell{x}_{y}"] = Cell(gridPosition = [x,y], piece = piece, text = f'{piece.colour} {piece.piece}' if piece else '', width = 9, height = 3, master=frame)
             globals()[f"cell{x}_{y}"].grid(row = y, column = x)
-            cells.append(globals()[f"cell{x}_{y}"])
+            cells[f"cell{x}_{y}"] = globals()[f"cell{x}_{y}"]
 
 
     frame.pack()
-    for c in cells:
-        c['bg'] = 'grey90'
+    for key, cell in cells.items():
+        cell['bg'] = 'grey90'
 
 
     window.mainloop()

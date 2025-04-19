@@ -9,6 +9,7 @@ def isPosition(pos):
     """
     if  pos[0] > 8  or pos[0] < 1 \
         or  pos[1] > 8 or pos[1] < 1:
+        print('not a position')
         raise Exception()
     else:
         pass
